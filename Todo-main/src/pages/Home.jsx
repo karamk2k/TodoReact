@@ -131,6 +131,33 @@ export default function Home() {
     }
 
     }
+ 
+    async function handelChangeStatus(id){
+        const url = `http://127.0.0.1:8000/api/todos/complete/${id}`;
+        const headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+        };
+
+        try {
+            const res = await fetch(url, {
+                method: "put",
+                headers
+               
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.message || "Failed to add todo");
+            setTodos((prevTodos) =>
+                prevTodos.map((todo) =>
+                    todo.id === id ? { ...todo, completed: !todo.completed } : todo
+                )
+            );
+            setShowForm(false)
+        } catch (error) {
+            console.log(error);
+        }
+    }
 
 
     return (
@@ -162,12 +189,13 @@ export default function Home() {
 <div className="flex flex-wrap justify-center items-start min-h-screen bg-gray-100 gap-6 p-6">
     {todos.length > 0 ? (
         todos.map((todo) => (
-            <Card key={todo.id} className="bg-white shadow-md rounded-lg p-4 w-80 border border-gray-200">
+            <Card key={todo.id} classname="bg-white shadow-md rounded-lg p-4 w-80 border border-gray-200 flex flex-wrap">
                 <h3 className="text-lg font-semibold">{todo.name}</h3>
                 <p className="text-gray-600">{todo.description}</p>
                 <div className="flex justify-between mt-3">
                     <Button name="Update" placeholder="Update" onClick={() => handleUpdate(todo)} st="px-4 py-2 ml-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition" />
                     <Button name="Delete" placeholder="Delete" onClick={() =>handelDelete(todo.id) } st="px-4 py-2 ml-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition" />
+                    <Button name={todo.completed? "Completed" : "Uncompleted"} placeholder="" onClick={() => handelChangeStatus(todo.id)}  st="px-4 py-2 ml-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition" />
                 </div>
             </Card>
         ))

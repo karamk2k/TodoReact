@@ -54,4 +54,12 @@ class TodoController extends Controller
             'data' => $todo
         ]);
     }
+    public function complete(Todo $todo){
+        $todo->completed = !$todo->completed;
+        $todo->save();
+        return response()->json([
+            'status' => 'success',
+            'data' => $todo
+        ]);
+    }
 }
